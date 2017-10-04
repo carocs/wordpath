@@ -11,21 +11,53 @@ def hamming_distance(word1, word2):
 
 def parse_dict(dict, root):
     """parse the dict file and create a dictionary object with each word and the Hamming distance to the root"""
-    word_dict = {}
+    word_list = []
     rootlen = root.__len__()
     # read file line by line
     with open(dict) as f:
         for line in f.read().splitlines():
             # if a word has the same length as the root, add it to the dict the hamming distance to the root
             if line.__len__() == rootlen:
-                word_dict[line] = hamming_distance(root, line)
-            # if not, ignore it.
+                word_list.append(line)
+                # if not, ignore it.
+    return word_list
 
-    return word_dict
+
+def find_leaves(word_list, word):
+    """find all leaves for a given word.
+    in this context, leaves for a given node (word) are all the words with hamming distance 1 from the node."""
+    for w in word_list:
+        if hamming_distance(w, word) == 1:
+            yield w
 
 
-def find_path(word_dict, root, target):
-    """find a path from root to target, using a dictionary with hamming distance between words"""
+def generate_tree(word_list, root, target):
+    """generates a tree graph from the word list from root to target with a defined maximum depth
+    this tree is created breadth-first and is represented with an adjacency matrix,
+    which is returned once it finds the target or hit the maximum depth"""
+    tree = []
+    max_depth = 10
+
+    for depth in range(max_depth):
+        if depth == 0:
+            tree.append({})
+            tree[depth][root] = set([])
+        tree.append({})
+        for word in tree[depth].keys():
+            for leaf in find_leaves(word_list, word):
+                if leaf in tree[depth + 1].keys():
+                    tree[depth + 1][leaf].add(word)
+                else:
+                    tree[depth + 1][leaf] = set([word])
+                if leaf == target:
+                    return tree, root, target
+
+    print ("Target word not found after %d iterations." % max_depth)
+    sys.exit(1)
+
+
+def find_path(tree, root, target):
+    """bottom up path finder in a tree graph"""
     path = []
 
     return path
@@ -33,13 +65,11 @@ def find_path(word_dict, root, target):
 
 def solve(dict, root, target):
     """solve the path problem, parsing the dictionary file and finding the bath between root and target"""
-    solving_path = []
-
     # parse the dict
-    word_dict = parse_dict(dict, root)
+    word_list = parse_dict(dict, root)
 
     # find the path
-    solving_path = find_path(word_dict, root, target)
+    solving_path = find_path(generate_tree(word_list, root, target))
 
     return solving_path
 
