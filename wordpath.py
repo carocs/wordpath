@@ -13,23 +13,23 @@ def hamming_distance(word1, word2):
 
 
 def parse_dict(dic):
-    """parse the dict file and create a dictionary object with each word and the Hamming distance to the root"""
+    """parse the dict file and create a list object with each word with the same length as the root"""
     word_list = []
     rootlen = ROOT.__len__()
+
     # read file line by line
     with open(dic) as f:
         for line in f.read().splitlines():
-            # if a word has the same length as the root, add it to the dict the hamming distance to the root
+            # if a word has the same length as the root, add it to the list
             if line.__len__() == rootlen:
                 word_list.append(line)
-                # if not, ignore it.
 
     if ROOT not in word_list:
-        print ("the word %s is not in the dictionary file." % ROOT)
+        print ("The word %s is not in the dictionary file." % ROOT)
         sys.exit(1)
 
     if TARGET not in word_list:
-        print ("the word %s is not in the dictionary file." % TARGET)
+        print ("The word %s is not in the dictionary file." % TARGET)
         sys.exit(1)
 
     return word_list
@@ -44,11 +44,11 @@ def find_leaves(word_list, word):
 
 
 def generate_tree(word_list):
-    """generates a tree graph from the word list from root to target with a defined maximum depth
-    this tree is created breadth-first and is represented with an adjacency matrix,
+    """generates a tree graph from the word list from root to target with a maximum depth equal to the length
+    of the words squared. this tree is created breadth-first and is represented with an adjacency matrix,
     which is returned once it finds the target or hit the maximum depth"""
     tree = []
-    max_depth = 10
+    max_depth = ROOT.__len__() ** 2
 
     for depth in range(max_depth):
         if depth == 0:
@@ -64,12 +64,12 @@ def generate_tree(word_list):
                 if leaf == TARGET:
                     return tree
 
-    print ("Target word not found after %d iterations." % max_depth)
+    print ("Target word not found after %d letter substitutions." % max_depth)
     sys.exit(1)
 
 
 def find_path(tree):
-    """bottom up path finder in a tree graph"""
+    """bottom-up path finder in a tree graph"""
     node = TARGET
     path = [node]
 
@@ -82,11 +82,12 @@ def find_path(tree):
 
 
 def solve(dic, root, target):
-    """solve the path problem, parsing the dictionary file and finding the bath between root and target"""
+    """solve the path problem, parsing the dictionary file and finding the path between root and target"""
     global ROOT
     global TARGET
     ROOT = root
     TARGET = target
+
     # parse the dict
     word_list = parse_dict(dic)
 
@@ -120,10 +121,9 @@ def main():
         print ("Since only substitutions are allowed, only words with the same length have paths.")
         sys.exit(1)
 
-    # find a path between the words
+    # find a path between the words and print it
     solution = solve(args.dictfile, args.rootword, args.targetword)
 
-    # print the results
     print (' -> '.join(solution))
 
 
