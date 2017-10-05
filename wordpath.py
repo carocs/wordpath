@@ -38,6 +38,14 @@ def generate_tree(word_list, root, target):
     tree = []
     max_depth = 10
 
+    if root not in word_list:
+        print "the word %s is not in the dictionary file." % root
+        sys.exit(1)
+
+    if target not in word_list:
+        print "the word %s is not in the dictionary file." % target
+        sys.exit(1)
+
     for depth in range(max_depth):
         if depth == 0:
             tree.append({})
