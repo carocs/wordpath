@@ -9,12 +9,12 @@ def hamming_distance(word1, word2):
     return sum(c1 != c2 for c1, c2 in zip(word1, word2))
 
 
-def parse_dict(dict, root):
+def parse_dict(dic, root):
     """parse the dict file and create a dictionary object with each word and the Hamming distance to the root"""
     word_list = []
     rootlen = root.__len__()
     # read file line by line
-    with open(dict) as f:
+    with open(dic) as f:
         for line in f.read().splitlines():
             # if a word has the same length as the root, add it to the dict the hamming distance to the root
             if line.__len__() == rootlen:
@@ -50,7 +50,7 @@ def generate_tree(word_list, root, target):
                 else:
                     tree[depth + 1][leaf] = set([word])
                 if leaf == target:
-                    return tree, root, target
+                    return tree
 
     print ("Target word not found after %d iterations." % max_depth)
     sys.exit(1)
@@ -58,18 +58,24 @@ def generate_tree(word_list, root, target):
 
 def find_path(tree, root, target):
     """bottom up path finder in a tree graph"""
-    path = []
+    path = [target]
+    node = target
 
-    return path
+    for level in reversed(range(tree.__len__())):
+        if node is not root:
+            node = tree[level][node].pop()
+            path.append(node)
+
+    return reversed(path)
 
 
-def solve(dict, root, target):
+def solve(dic, root, target):
     """solve the path problem, parsing the dictionary file and finding the bath between root and target"""
     # parse the dict
-    word_list = parse_dict(dict, root)
+    word_list = parse_dict(dic, root)
 
     # find the path
-    solving_path = find_path(generate_tree(word_list, root, target))
+    solving_path = find_path(generate_tree(word_list, root, target), root, target)
 
     return solving_path
 
@@ -102,7 +108,7 @@ def main():
     solution = solve(args.dictfile, args.rootword, args.targetword)
 
     # print the results
-    print solution
+    print (' -> '.join(solution))
 
 
 if __name__ == "__main__":
